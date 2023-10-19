@@ -1,0 +1,37 @@
+/* General styles */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 20px;
+}
+
+body {
+    width: 100vw;
+    height: 100vh;
+    background-color: rgb(25, 25, 25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.main-container {
+    height: 70%;
+    min-height: 250px;
+    aspect-ratio: 1/1;
+    display: grid;
+    gap: 10px;
+    grid-template-rows: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+
+.tile {
+    background-color: antiquewhite;
+}
