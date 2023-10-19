@@ -1,9 +1,29 @@
-git init
-git add README.md
-git commit -m "first commit"
-git branch -M main
-git remote add origin git@github.com:sevleo/tic_tac_toe.git
-git push -u origin main
+1 The page loads
+2 Create the Game module
+    2.1 Run "Load Select Player Menu" function
+        - This menu contains two blocks where user chooses player 1 setup and player 2 setup
+        - For each player, they choose type: Human or Computer
+        - For computer type, they choose difficulty: easy, normal, hard, impossible
+        - Default values will be Human for each player
+        - There will be button "Start", when pressing the button:
+            - store players in objects in Game module
+            - run "Create tiles" and "Show tiles" from Gameboard
+
+3 Create the Gameboard module
+4 Run Game
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

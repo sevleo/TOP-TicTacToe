@@ -22,15 +22,41 @@ body {
 }
 
 .main-container {
-    height: 70%;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.settings-container {
+    width: 90%;
+    height: 90%;
+    background-color: rgb(223 255 0);
+    display: grid;
+}
+
+.player-selection-area {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr;
+}
+
+
+
+
+
+
+.gameboard-container {
     min-height: 250px;
     aspect-ratio: 1/1;
+    height: 70%;
+    background-color: rgb(223 255 0);
     display: grid;
     gap: 10px;
     grid-template-rows: 1fr 1fr 1fr;
     grid-template-columns: 1fr 1fr 1fr;
 }
-
 
 .tile {
     background-color: antiquewhite;
