@@ -56,22 +56,29 @@ const game = (function () {
             computer_option.textContent = 'Computer';
             player_settings_div.append(computer_option);
             computer_option.addEventListener('click', () => {
-                show_difficulty();
+                show_difficulty(player_settings_div);
             });
 
             // Show difficulty settings for "Computer" player option
-            function show_difficulty() {
-                easy = document.createElement('div');
-                easy.textContent = 'Easy';
-                player_settings_div.append(easy);
-
-                medium = document.createElement('div');
-                medium.textContent = 'Medium';
-                player_settings_div.append(medium);
-
-                hard = document.createElement('div');
-                hard.textContent = 'Hard';
-                player_settings_div.append(hard);
+            function show_difficulty(player_settings_div) {
+                existing_buttons = document.querySelector(`.player-selection.${player_settings_div.classList[1]} > .difficulty`);
+                // Check if nodes for these buttons already exist in corresponding player selection area
+                if (!existing_buttons) {
+                    easy = document.createElement('div');
+                    easy.textContent = 'Easy';
+                    easy.classList.add('difficulty');
+                    player_settings_div.append(easy);
+    
+                    medium = document.createElement('div');
+                    medium.textContent = 'Medium';
+                    medium.classList.add('difficulty');
+                    player_settings_div.append(medium);
+    
+                    hard = document.createElement('div');
+                    hard.textContent = 'Hard';
+                    hard.classList.add('difficulty');
+                    player_settings_div.append(hard);
+                }
             }
 
             // Hide difficulty settings when "Computer" player option is 
@@ -80,7 +87,6 @@ const game = (function () {
                 console.log('test');
             }
         };
-
 
         // Draw start-button
         start_game_button = document.createElement('button');
