@@ -42,11 +42,6 @@ body {
     grid-template-rows: 1fr;
 }
 
-
-
-
-
-
 .gameboard-container {
     min-height: 250px;
     aspect-ratio: 1/1;
@@ -60,4 +55,12 @@ body {
 
 .tile {
     background-color: antiquewhite;
+}
+
+.tile.PlayerOne {
+    background-color: red;
+}
+
+.tile.PlayerTwo {
+    background-color: rgb(55, 0, 255);
 }

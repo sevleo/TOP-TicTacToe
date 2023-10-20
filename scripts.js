@@ -1,11 +1,18 @@
+/*
+** The gameSettings module is responsible for drawing and hiding the settings of the game from the screen
+*/
+const gameSettings = (function () {
 
-// Game core object
-const game = (function () {
+    // Create these guys with factory
     let player1 = {
-        'name': 'Player X',
+        'name': 'PlayerX',
+        'selected': [],
+        'tile_class': 'PlayerOne',
     }
     let player2 = {
-        'name': 'Player O',
+        'name': 'PlayerO',
+        'selected': [],
+        'tile_class': 'PlayerTwo',
     }
 
     // Draw "settings-container" div and its children
@@ -104,7 +111,7 @@ const game = (function () {
         });
 
         // Hide gameboard tiles when show_game_settings is called
-        gameBoard.hide_tiles();
+        // gameBoard.hide_tiles();
     }
 
     // Hides game settings, invoked by clicking at "start-button"
@@ -125,9 +132,25 @@ const game = (function () {
 })();
 
 
-// Object to control behavior of gameboard
+/*
+** The Gameboard represents the state of the board, 
+** showing tiles and hiding tiles from the screen
+*/
 const gameBoard = (function () {
     let tiles = [];
+    let player_turn = '';
+    let selected_tiles = [];
+
+    const winning_conditions = [
+        [1, 2, 3],
+        [4, 5, 6],
+        [7, 8, 9],
+        [1, 4, 7],
+        [2, 5, 8],
+        [3, 6, 9],
+        [1, 5, 9],
+        [3, 5, 7],
+    ]
 
     // Fill "tiles" array with tiles objects
     const create_tiles = () => {
@@ -200,6 +223,7 @@ const gameBoard = (function () {
 
     // Add gameboard and tiles to DOM
     const show_tiles = () => {
+        switch_player_turn();
         main_container = document.querySelector('#main-container');
         
         // Draw gameboard
@@ -216,6 +240,28 @@ const gameBoard = (function () {
             div.setAttribute('tile_column', element.tile_column);
             div.setAttribute('value', element.value);
             gameboard_container.append(div);
+
+            div.addEventListener('click', () => { 
+                // The if ensures that the move counts only when selecting a tile that was not selected before
+                if (!selected_tiles.includes(parseInt((div.getAttribute('tile_num'))))){
+                    player_turn.selected.push(parseInt(div.getAttribute('tile_num')));
+                    selected_tiles.push(parseInt(div.getAttribute('tile_num')));
+                    div.classList.add(player_turn.tile_class);
+                    
+                    // If winning conditions are met, go back to Settings and reset game data
+                    if (winning_conditions_met()) {
+                        gameBoard.hide_tiles(); 
+                        gameSettings.show_game_settings();
+                        gameSettings.player1.selected = [];
+                        gameSettings.player2.selected = [];
+                        selected_tiles = [];
+                    }
+                    // Otherwise, switch player and continue game
+                    else {
+                        switch_player_turn();
+                    }
+                }
+            });
         });
     };
 
@@ -240,14 +286,40 @@ const gameBoard = (function () {
         console.log(tiles);
     };
 
-    
+    // Switch play turn each time after selecting a tile
+    const switch_player_turn = () => {
+        if (!player_turn) {
+            player_turn = gameSettings.player1;
+        }
+        else {
+            player_turn = player_turn === gameSettings.player1 ? gameSettings.player2 : gameSettings.player1;
+        }
+    }
+
+    // Check if winnning conditions are met by comparing each condition to player data
+    const winning_conditions_met = () => {
+        for (const condition of winning_conditions) {
+            const winning_condition_met = condition.every(value => player_turn.selected.includes(value));
+            if (winning_condition_met) {
+                return true
+            }
+        }
+        return false
+    };
+
+
+
     return {
         create_tiles,
         show_tiles,
         hide_tiles,
         log_tiles,
+        switch_player_turn,
     }
 })();
 
 // Draw "settings-container" div and its children
-game.show_game_settings();
+gameSettings.show_game_settings();
+
+
+        

@@ -12,10 +12,7 @@
 3 Create the Gameboard module
 4 Run Game
 
-
-
-
-
+Create players with factories
 
 
 
