@@ -36,11 +36,11 @@ const game = (function () {
         fill_player_selection(player2_settings, "Player O");
 
         // Draw insides of player-selection-one/two div
-        function fill_player_selection(player_settings_div, player_object) {
+        function fill_player_selection(player_settings_div, player) {
             player_name = document.createElement('p');
             
             // Draw player name 
-            player_name.textContent = player_object;
+            player_name.textContent = player;
             player_settings_div.append(player_name);
 
             // Draw "Human" player option
@@ -48,7 +48,7 @@ const game = (function () {
             human_option.textContent = 'Human';
             player_settings_div.append(human_option);
             human_option.addEventListener('click', () => {
-                hide_difficulty();
+                hide_difficulty(player_settings_div);
             });
 
             // Draw "Computer" player option
@@ -83,8 +83,13 @@ const game = (function () {
 
             // Hide difficulty settings when "Computer" player option is 
             // no longer selected
-            function hide_difficulty() {
-                console.log('test');
+            function hide_difficulty(player_settings_div) {
+                existing_buttons = document.querySelectorAll(`.player-selection.${player_settings_div.classList[1]} > .difficulty`);
+                if (existing_buttons) {
+                    existing_buttons.forEach((button) => {
+                        button.remove();
+                    });
+                }
             }
         };
 
