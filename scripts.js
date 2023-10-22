@@ -260,6 +260,7 @@ const gameBoard = (function () {
                     remaining_tiles = remaining_tiles.filter(item => item !== (parseInt(div.getAttribute('tile_num'))));
                     div.classList.add(player_turn.tile_class);
                     
+                    
                     // If winning conditions are met, go back to Settings and reset game data
                     if (winning_conditions_met()) {
                         end_game();
@@ -297,8 +298,8 @@ const gameBoard = (function () {
     };
 
     // Log tiles object to console for testing purposes
-    const log_tiles = () => {
-        console.log(tiles);
+    const console_log = () => {
+        console.log(player_turn);
     };
 
     // Switch play turn each time after selecting a tile
@@ -314,8 +315,6 @@ const gameBoard = (function () {
         if (player_turn.player_type === 'computer') {
             const randomIndex = Math.floor(Math.random() * remaining_tiles.length);
             const randomValue = remaining_tiles[randomIndex];
-            console.log(randomValue);
-            console.log(typeof(randomValue));
             player_turn.selected.push(randomValue);
             selected_tiles.push(randomValue);
             remaining_tiles = remaining_tiles.filter(item => item !== (randomValue));
@@ -351,8 +350,11 @@ const gameBoard = (function () {
         create_tiles,
         show_tiles,
         hide_tiles,
-        log_tiles,
+        console_log,
         switch_player_turn,
+        player_turn,
+        selected_tiles,
+        remaining_tiles,
     }
 })();
 
