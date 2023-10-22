@@ -1,19 +1,21 @@
 /*
-** The gameSettings module is responsible for drawing and hiding the settings of the game from the screen
+** The gameSettings module is responsible for drawing and hiding the settings of the game from the screen,
+** as well as managing the player objects
 */
 const gameSettings = (function () {
 
-    // Create these guys with factory
-    let player1 = {
-        'name': 'PlayerX',
-        'selected': [],
-        'tile_class': 'PlayerOne',
-    }
-    let player2 = {
-        'name': 'PlayerO',
-        'selected': [],
-        'tile_class': 'PlayerTwo',
-    }
+    // Create two players
+    let player1 = createPlayer('PlayerX', 'PlayerOne');
+    let player2 = createPlayer('PlayerO', 'PlayerTwo');
+
+    // Factory function to create player objects
+    function createPlayer(name, tile_class) {
+        return {
+            name: name,
+            tile_class: tile_class,
+            selected: [],
+        }
+    };
 
     // Draw "settings-container" div and its children
     // Run at the page load
@@ -109,9 +111,6 @@ const gameSettings = (function () {
         start_game_button.addEventListener('click', function () {
             hide_game_settings();
         });
-
-        // Hide gameboard tiles when show_game_settings is called
-        // gameBoard.hide_tiles();
     }
 
     // Hides game settings, invoked by clicking at "start-button"
@@ -250,12 +249,22 @@ const gameBoard = (function () {
                     
                     // If winning conditions are met, go back to Settings and reset game data
                     if (winning_conditions_met()) {
+                        gameBoard.hide_tiles();
+                        gameSettings.show_game_settings();
+                        gameSettings.player1.selected = [];
+                        gameSettings.player2.selected = [];
+                        selected_tiles = [];
+                    }
+
+                    // If 9 tiles have been selected and winning conditions are not met, go back to Settings and reset game data
+                    else if (selected_tiles.length === 9) {
                         gameBoard.hide_tiles(); 
                         gameSettings.show_game_settings();
                         gameSettings.player1.selected = [];
                         gameSettings.player2.selected = [];
                         selected_tiles = [];
                     }
+
                     // Otherwise, switch player and continue game
                     else {
                         switch_player_turn();

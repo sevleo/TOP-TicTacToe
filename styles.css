@@ -32,7 +32,7 @@ body {
 .settings-container {
     width: 90%;
     height: 90%;
-    background-color: rgb(223 255 0);
+    background-color: rgb(54, 54, 54);
     display: grid;
 }
 

@@ -15,6 +15,9 @@
 Create players with factories
 
 
+consider draw
+
+
 
 
 
