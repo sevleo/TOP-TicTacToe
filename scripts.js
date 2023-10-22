@@ -235,7 +235,6 @@ const gameBoard = (function () {
 
     // Add gameboard and tiles to DOM
     const show_tiles = () => {
-        switch_player_turn();
         main_container = document.querySelector('#main-container');
         
         // Draw gameboard
@@ -278,6 +277,7 @@ const gameBoard = (function () {
                 }
             });
         });
+        switch_player_turn();
     };
 
     // Remove gameboard and tiles from DOM
@@ -308,6 +308,20 @@ const gameBoard = (function () {
         }
         else {
             player_turn = player_turn === gameSettings.player1 ? gameSettings.player2 : gameSettings.player1;
+        }
+
+        // Move this to a separate method
+        if (player_turn.player_type === 'computer') {
+            const randomIndex = Math.floor(Math.random() * remaining_tiles.length);
+            const randomValue = remaining_tiles[randomIndex];
+            console.log(randomValue);
+            console.log(typeof(randomValue));
+            player_turn.selected.push(randomValue);
+            selected_tiles.push(randomValue);
+            remaining_tiles = remaining_tiles.filter(item => item !== (randomValue));
+            let tile_selected = document.querySelector(`[tile_num="${randomValue}"]`);
+            tile_selected.classList.add(player_turn.tile_class);
+            switch_player_turn();
         }
     }
 
