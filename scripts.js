@@ -5,15 +5,20 @@
 const gameSettings = (function () {
 
     // Create two players
-    let player1 = createPlayer('PlayerX', 'PlayerOne');
-    let player2 = createPlayer('PlayerO', 'PlayerTwo');
+    let player1 = createPlayer('Player X', 'PlayerOne');
+    let player2 = createPlayer('Player O', 'PlayerTwo');
 
     // Factory function to create player objects
-    function createPlayer(name, tile_class) {
+    function createPlayer(name, tile_class, ) {
+        let selected = [];
+        let player_type = 'human';
+        let computer_difficulty = '';
         return {
-            name: name,
-            tile_class: tile_class,
-            selected: [],
+            name,
+            tile_class,
+            selected,
+            player_type,
+            computer_difficulty,
         }
     };
 
@@ -36,36 +41,40 @@ const gameSettings = (function () {
         player1_settings = document.createElement('div');
         player1_settings.classList.add('player-selection', 'one');
         player_selection_area.append(player1_settings);
-        fill_player_selection(player1_settings, "Player X");
+        fill_player_selection(player1_settings, player1);
 
         // Draw player-selection two div
         player2_settings = document.createElement('div');
         player2_settings.classList.add('player-selection', 'two');
         player_selection_area.append(player2_settings);
-        fill_player_selection(player2_settings, "Player O");
+        fill_player_selection(player2_settings, player2);
 
         // Draw insides of player-selection-one/two div
         function fill_player_selection(player_settings_div, player) {
             player_name = document.createElement('p');
             
             // Draw player name 
-            player_name.textContent = player;
+            player_name.textContent = player.name;
             player_settings_div.append(player_name);
 
             // Draw "Human" player option
-            human_option = document.createElement('button');
+            human_option = document.createElement('div');
+            human_option.classList.add("human-option");
             human_option.textContent = 'Human';
             player_settings_div.append(human_option);
             human_option.addEventListener('click', () => {
                 hide_difficulty(player_settings_div);
+                player.player_type = 'human';
             });
 
             // Draw "Computer" player option
-            computer_option = document.createElement('button');
+            computer_option = document.createElement('div');
             computer_option.textContent = 'Computer';
+            computer_option.classList.add("computer-option");
             player_settings_div.append(computer_option);
             computer_option.addEventListener('click', () => {
                 show_difficulty(player_settings_div);
+                player.player_type = 'computer';
             });
 
             // Show difficulty settings for "Computer" player option
@@ -75,18 +84,21 @@ const gameSettings = (function () {
                 if (!existing_buttons) {
                     easy = document.createElement('div');
                     easy.textContent = 'Easy';
-                    easy.classList.add('difficulty');
+                    easy.classList.add('difficulty', 'easy');
                     player_settings_div.append(easy);
+                    player.computer_difficulty = 'easy';
     
                     medium = document.createElement('div');
                     medium.textContent = 'Medium';
-                    medium.classList.add('difficulty');
+                    medium.classList.add('difficulty', 'medium');
                     player_settings_div.append(medium);
+                    player.computer_difficulty = 'medium';
     
                     hard = document.createElement('div');
                     hard.textContent = 'Hard';
-                    hard.classList.add('difficulty');
+                    hard.classList.add('difficulty', 'hard');
                     player_settings_div.append(hard);
+                    player.computer_difficulty = 'hard';
                 }
             }
 
@@ -139,6 +151,7 @@ const gameBoard = (function () {
     let tiles = [];
     let player_turn = '';
     let selected_tiles = [];
+    let remaining_tiles = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
     const winning_conditions = [
         [1, 2, 3],
@@ -207,14 +220,14 @@ const gameBoard = (function () {
                 tile_num: 8,
                 tile_row: 3,
                 tile_column: 2,
-                value: 'x',
+                value: 'empty',
             },
                     
             {
                 tile_num: 9,
                 tile_row: 3,
                 tile_column: 3,
-                value: 'o',
+                value: 'empty',
             },
         ];
         tiles = new_tiles;
@@ -245,24 +258,17 @@ const gameBoard = (function () {
                 if (!selected_tiles.includes(parseInt((div.getAttribute('tile_num'))))){
                     player_turn.selected.push(parseInt(div.getAttribute('tile_num')));
                     selected_tiles.push(parseInt(div.getAttribute('tile_num')));
+                    remaining_tiles = remaining_tiles.filter(item => item !== (parseInt(div.getAttribute('tile_num'))));
                     div.classList.add(player_turn.tile_class);
                     
                     // If winning conditions are met, go back to Settings and reset game data
                     if (winning_conditions_met()) {
-                        gameBoard.hide_tiles();
-                        gameSettings.show_game_settings();
-                        gameSettings.player1.selected = [];
-                        gameSettings.player2.selected = [];
-                        selected_tiles = [];
+                        end_game();
                     }
 
                     // If 9 tiles have been selected and winning conditions are not met, go back to Settings and reset game data
                     else if (selected_tiles.length === 9) {
-                        gameBoard.hide_tiles(); 
-                        gameSettings.show_game_settings();
-                        gameSettings.player1.selected = [];
-                        gameSettings.player2.selected = [];
-                        selected_tiles = [];
+                        end_game();
                     }
 
                     // Otherwise, switch player and continue game
@@ -315,6 +321,15 @@ const gameBoard = (function () {
         }
         return false
     };
+
+    function end_game () {
+        gameBoard.hide_tiles();
+        gameSettings.show_game_settings();
+        gameSettings.player1.selected = [];
+        gameSettings.player2.selected = [];
+        selected_tiles = [];
+        remaining_tiles = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+    }
 
 
 

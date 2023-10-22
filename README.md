@@ -1,21 +1,28 @@
-1 The page loads
-2 Create the Game module
-    2.1 Run "Load Select Player Menu" function
-        - This menu contains two blocks where user chooses player 1 setup and player 2 setup
-        - For each player, they choose type: Human or Computer
-        - For computer type, they choose difficulty: easy, normal, hard, impossible
-        - Default values will be Human for each player
-        - There will be button "Start", when pressing the button:
-            - store players in objects in Game module
-            - run "Create tiles" and "Show tiles" from Gameboard
+When tiles load, check if current turn is that of a computer
+If yes, select a random tile
+If no, let player make the move
 
-3 Create the Gameboard module
-4 Run Game
+When player makes the move, switch the turn and check if now is the turn of the computer. 
+    If now is the turn of the computer:
+        - select a random value from the list of remaining tiles
+        - push the value to player_turn.selected
+        - push the value to the selected_tiles
+        - remove the value from the remaining_tiles
+        - querySelect the tile with this tile_num
+        - add class player_turn.tile_class
+        - check if winning condition is met or if selected_tiles.length === 9
+            - if yes, end_game();
+            - if no, switch_player_turn();
 
-Create players with factories
 
-
-consider draw
+                        // implement random movement here if player is computer
+                        // console.log(remaining_tiles);
+                        // console.log(player_turn.player_type);
+                        // if (player_turn.player_type === 'computer') {
+                        //     const randomIndex = Math.floor(Math.random() * remaining_tiles.length);
+                        //     const randomValue = remaining_tiles[randomIndex];
+                        //     console.log(randomValue);
+                        // }
 
 
 
