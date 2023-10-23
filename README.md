@@ -1,22 +1,7 @@
-When tiles load, check if current turn is that of a computer
-If yes, select a random tile
-If no, let player make the move
-
-When player makes the move, switch the turn and check if now is the turn of the computer. 
-    If now is the turn of the computer:
-        - select a random value from the list of remaining tiles
-        - push the value to player_turn.selected
-        - push the value to the selected_tiles
-        - remove the value from the remaining_tiles
-        - querySelect the tile with this tile_num
-        - add class player_turn.tile_class
-
-        --- continue here ---
-        - check if winning condition is met or if selected_tiles.length === 9
-            - if yes, end_game();
-            - if no, switch_player_turn();
-
-
+implement the minimax algorithm
+in switch_player_turn, move to a separate function the part of code responsible for computer move
+add redirect to the game resutls screen with buttons to go back to settings or start again
+add styles
 
 
 
