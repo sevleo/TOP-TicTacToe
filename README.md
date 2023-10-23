@@ -4,7 +4,13 @@ add redirect to the game resutls screen with buttons to go back to settings or s
 add styles
 
 
+Minimax algo
 
+gameBoard.remaining_tiles
+gameBoard.selected_tiles
+gameSettings.player1.selected
+gameSettings.player2.selected
+gameBoard.gameState
 
 
 

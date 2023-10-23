@@ -303,7 +303,7 @@ const gameBoard = (function () {
                     if (!selected_tiles.includes(parseInt((div.getAttribute('tile_num'))))){
                         gameState.current_turn.selected.push(parseInt(div.getAttribute('tile_num')));
                         selected_tiles.push(parseInt(div.getAttribute('tile_num')));
-                        remaining_tiles = remaining_tiles.filter(item => item !== (parseInt(div.getAttribute('tile_num'))));
+                        gameBoard.remaining_tiles = gameBoard.remaining_tiles.filter(item => item !== (parseInt(div.getAttribute('tile_num'))));
                         div.classList.add(gameState.current_turn.tile_class);
                         handleGameTurn();
                     }
@@ -424,6 +424,7 @@ const gameBoard = (function () {
         show_tiles,
         console_log,
         remaining_tiles,
+        selected_tiles,
         gameState,
     }
 })();
