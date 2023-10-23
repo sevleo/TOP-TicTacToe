@@ -278,6 +278,7 @@ const gameBoard = (function () {
                 }
             });
         });
+
         switch_player_turn();
     };
 
@@ -300,6 +301,7 @@ const gameBoard = (function () {
     // Log tiles object to console for testing purposes
     const console_log = () => {
         console.log(player_turn);
+        // console.log(tiles);
     };
 
     // Switch play turn each time after selecting a tile
@@ -320,7 +322,21 @@ const gameBoard = (function () {
             remaining_tiles = remaining_tiles.filter(item => item !== (randomValue));
             let tile_selected = document.querySelector(`[tile_num="${randomValue}"]`);
             tile_selected.classList.add(player_turn.tile_class);
-            switch_player_turn();
+
+            // If winning conditions are met, go back to Settings and reset game data
+            if (winning_conditions_met()) {
+                end_game();
+            }
+
+            // If 9 tiles have been selected and winning conditions are not met, go back to Settings and reset game data
+            else if (selected_tiles.length === 9) {
+                end_game();
+            }
+
+            // Otherwise, switch player and continue game
+            else {
+                switch_player_turn();
+            }
         }
     }
 
@@ -342,6 +358,7 @@ const gameBoard = (function () {
         gameSettings.player2.selected = [];
         selected_tiles = [];
         remaining_tiles = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+        player_turn = '';
     }
 
 
