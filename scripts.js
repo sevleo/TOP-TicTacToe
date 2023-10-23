@@ -26,16 +26,13 @@ const gameSettings = (function () {
     // Run at the page load
     function show_game_settings () {
 
-        // Reset game stats
-        gameSettings.player1.selected = [];
+        // Reset player settings to default
         gameSettings.player1.computer_difficulty = 'easy';
         gameSettings.player1.player_type = 'human';
-        gameSettings.player2.selected = [];
         gameSettings.player2.computer_difficulty = 'easy';
         gameSettings.player2.player_type = 'human';
-        selected_tiles = [];
-        remaining_tiles = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-        player_turn = '';
+
+        // Select main-container
         main_container = document.querySelector('#main-container');
 
         // Draw settings-container div
@@ -147,8 +144,16 @@ const gameSettings = (function () {
         settings_container = document.querySelector('.settings-container');
         settings_container.remove();
 
+        // Reset game stats
+        gameSettings.player1.selected = [];
+        gameSettings.player2.selected = [];
+        selected_tiles = [];
+        remaining_tiles = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+        gameBoard.gameState.current_turn = '';
+
         gameBoard.create_tiles();
         gameBoard.show_tiles();
+
     }
 
     return {
@@ -161,15 +166,16 @@ const gameSettings = (function () {
 
 /*
 ** The Gameboard represents the state of the board, 
-** showing tiles and hiding tiles from the screen
+** showing tiles and hiding tiles from the screen, as well as 
+** definig winning conditions, handling turns, and managing AI
 */
 const gameBoard = (function () {
     let tiles = [];
-    let player_turn = '';
     let selected_tiles = [];
     let remaining_tiles = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
     const gameState = {
+        current_turn: '',
         game_over: false,
         tie: false,
         player1_winner: false,
@@ -191,10 +197,6 @@ const gameBoard = (function () {
             }
         },
     }
-
-
-
-
 
     const winning_conditions = [
         [1, 2, 3],
@@ -299,10 +301,10 @@ const gameBoard = (function () {
                 if (!gameBoard.gameState.game_over) {
                     // The if ensures that the move counts only when selecting a tile that was not selected before
                     if (!selected_tiles.includes(parseInt((div.getAttribute('tile_num'))))){
-                        player_turn.selected.push(parseInt(div.getAttribute('tile_num')));
+                        gameState.current_turn.selected.push(parseInt(div.getAttribute('tile_num')));
                         selected_tiles.push(parseInt(div.getAttribute('tile_num')));
                         remaining_tiles = remaining_tiles.filter(item => item !== (parseInt(div.getAttribute('tile_num'))));
-                        div.classList.add(player_turn.tile_class);
+                        div.classList.add(gameState.current_turn.tile_class);
                         handleGameTurn();
                     }
                 }
@@ -332,35 +334,36 @@ const gameBoard = (function () {
 
     // Log tiles object to console for testing purposes
     function console_log () {
-        console.log(player_turn);
+        console.log(gameState.current_turn);
         // console.log(tiles);
     };
 
     // Switch play turn each time after selecting a tile
     function switch_player_turn () {
         // Setting initial player turn
-        if (!player_turn) {
-            player_turn = gameSettings.player1;
+        if (!gameState.current_turn) {
+            // gameState.current_turn = player_turn;
+            gameState.current_turn = gameSettings.player1;
         }
 
         // Switching player turns
         else {
-            player_turn = player_turn === gameSettings.player1 ? gameSettings.player2 : gameSettings.player1;
+            gameState.current_turn = gameState.current_turn === gameSettings.player1 ? gameSettings.player2 : gameSettings.player1;
         }
 
         // Check if now is the turn of the computer and if yes, make the move and run handleGameTurn again
         // Move this to a separate method
-        if (player_turn.player_type === 'computer' && player_turn.computer_difficulty === 'easy') {
+        if (gameState.current_turn.player_type === 'computer' && gameState.current_turn.computer_difficulty === 'easy') {
             const randomIndex = Math.floor(Math.random() * remaining_tiles.length);
             const randomValue = remaining_tiles[randomIndex];
-            player_turn.selected.push(randomValue);
+            gameState.current_turn.selected.push(randomValue);
             selected_tiles.push(randomValue);
             remaining_tiles = remaining_tiles.filter(item => item !== (randomValue));
             let tile_selected = document.querySelector(`[tile_num="${randomValue}"]`);
-            tile_selected.classList.add(player_turn.tile_class);
+            tile_selected.classList.add(gameState.current_turn.tile_class);
             handleGameTurn();
         }
-        if (player_turn.player_type === 'computer' && player_turn.computer_difficulty === 'hard') {
+        if (gameState.current_turn.player_type === 'computer' && gameState.current_turn.computer_difficulty === 'hard') {
             handleGameTurn();
         }
     }
@@ -368,7 +371,7 @@ const gameBoard = (function () {
     // Check if winnning conditions are met by comparing each condition to player data
     function winning_conditions_met () {
         for (const condition of winning_conditions) {
-            const winning_condition_met = condition.every(value => player_turn.selected.includes(value));
+            const winning_condition_met = condition.every(value => gameState.current_turn.selected.includes(value));
             if (winning_condition_met) {
                 return true
             }
@@ -394,7 +397,7 @@ const gameBoard = (function () {
                 gameBoard.gameState.player2_winner = true;
             }
         }
-        
+
         console.log(gameBoard.gameState);
     }
 
@@ -402,7 +405,7 @@ const gameBoard = (function () {
     function handleGameTurn() {
         // Handle each game turn
         if (winning_conditions_met()) {
-            end_game(player_turn);
+            end_game(gameState.current_turn);
         }
 
         // If 9 tiles have been selected and winning conditions are not met, go back to Settings and reset game data
