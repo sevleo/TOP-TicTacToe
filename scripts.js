@@ -5,19 +5,18 @@
 const gameSettings = (function () {
 
     // Create two players
-    let player1 = createPlayer('Player X', 'PlayerOne', 'x');
-    let player2 = createPlayer('Player O', 'PlayerTwo', 'y');
+    // (move this to gameBoard)
+    let player1 = createPlayer('Player X', 'x');
+    let player2 = createPlayer('Player O', 'o');
 
     // Factory function to create player objects
-    function createPlayer(name, tile_class, marker) {
-        let selected = [];
+    // (move this to gameBoard)
+    function createPlayer(name, marker) {
         let player_type = 'human';
         let computer_difficulty = 'easy';
         return {
             name,
-            tile_class,
             marker,
-            selected,
             player_type,
             computer_difficulty,
         }
@@ -145,16 +144,7 @@ const gameSettings = (function () {
         settings_container = document.querySelector('.settings-container');
         settings_container.remove();
 
-        // Reset game stats
-        gameSettings.player1.selected = [];
-        gameSettings.player2.selected = [];
-        selected_tiles = [];
-        gameBoard.remaining_tiles = [0, 1, 2, 3, 4, 5, 6, 7, 8];
-        gameBoard.gameState.current_turn = '';
-
-        gameBoard.create_tiles();
-        gameBoard.show_tiles();
-
+        gameBoard.startGame();
     }
 
     return {
@@ -171,13 +161,22 @@ const gameSettings = (function () {
 ** definig winning conditions, handling turns, and managing AI
 */
 const gameBoard = (function () {
-    let tiles = [];
-    let selected_tiles = [];
-    let remaining_tiles = [0, 1, 2, 3, 4, 5, 6, 7, 8];
-    let board_state = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+
+    let origBoard = Array.from(Array(9).keys());
+
+    const winning_conditions = [
+        [0, 1, 2],
+        [3, 4, 5],
+        [6, 7, 8],
+        [0, 3, 6],
+        [1, 4, 7],
+        [2, 5, 8],
+        [0, 4, 8],
+        [6, 4, 2]
+    ]
 
     const gameState = {
-        current_turn: '',
+        current_turn: gameSettings.player1,
         game_over: false,
         tie: false,
         player1_winner: false,
@@ -200,88 +199,12 @@ const gameBoard = (function () {
         },
     }
 
-    const winning_conditions = [
-        [0, 1, 2],
-        [3, 4, 5],
-        [6, 7, 8],
-        [0, 3, 6],
-        [1, 4, 7],
-        [2, 5, 8],
-        [0, 4, 8],
-        [6, 4, 2]
-    ]
-
-    // Fill "tiles" array with tiles objects
-    function  create_tiles () {
-        new_tiles = [
-            {
-                tile_num: 0,
-                tile_row: 1,
-                tile_column: 1,
-                value: 'empty',
-            },
-    
-            {
-                tile_num: 1,
-                tile_row: 1,
-                tile_column: 2,
-                value: 'empty',
-            },
-            
-            {
-                tile_num: 2,
-                tile_row: 1,
-                tile_column: 3,
-                value: 'empty',
-            },
-                    
-            {
-                tile_num: 3,
-                tile_row: 2,
-                tile_column: 1,
-                value: 'empty',
-            },
-                    
-            {
-                tile_num: 4,
-                tile_row: 2,
-                tile_column: 2,
-                value: 'empty',
-            },
-                    
-            {
-                tile_num: 5,
-                tile_row: 2,
-                tile_column: 3,
-                value: 'empty',
-            },
-                    
-            {
-                tile_num: 6,
-                tile_row: 3,
-                tile_column: 1,
-                value: 'empty',
-            },
-                    
-            {
-                tile_num: 7,
-                tile_row: 3,
-                tile_column: 2,
-                value: 'empty',
-            },
-                    
-            {
-                tile_num: 8,
-                tile_row: 3,
-                tile_column: 3,
-                value: 'empty',
-            },
-        ];
-        tiles = new_tiles;
-    };
+    function startGame() {
+        draw_gameboard();
+    }
 
     // Add gameboard and tiles to DOM
-    function show_tiles () {
+    function draw_gameboard () {
         main_container = document.querySelector('#main-container');
         
         // Draw gameboard
@@ -290,37 +213,110 @@ const gameBoard = (function () {
         main_container.append(gameboard_container);
 
         // Draw tiles
-        tiles.forEach((element) => {
+        origBoard.forEach((element) => {
             let div = document.createElement('div');
             div.classList.add('tile');
-            div.setAttribute('tile_num', element.tile_num);
-            div.setAttribute('tile_row', element.tile_row);
-            div.setAttribute('tile_column', element.tile_column);
-            div.setAttribute('value', element.value);
+            div.setAttribute('tile_num', element);
+            div.setAttribute('tile_value', element);
+            div.innerText = '';
             gameboard_container.append(div);
 
-            div.addEventListener('click', () => { 
-                if (!gameState.game_over) {
-                    // The if ensures that the move counts only when selecting a tile that was not selected before
-                    if (!selected_tiles.includes(parseInt((div.getAttribute('tile_num'))))){
-                        gameState.current_turn.selected.push(parseInt(div.getAttribute('tile_num')));
-                        selected_tiles.push(parseInt(div.getAttribute('tile_num')));
-                        remaining_tiles = remaining_tiles.filter(item => item !== (parseInt(div.getAttribute('tile_num'))));
-                        div.classList.add(gameState.current_turn.tile_class);
-                        handleGameTurn();
-                    }
-                }
-            });
+            // Add event listener to every tile
+            div.addEventListener('click', handleTurn, false);
         });
-
-        // Set initial player turn
-        switch_player_turn();
     };
+
+    function handleTurn(event) {
+        if (event.target.getAttribute('tile_value') != 'x' && event.target.getAttribute('tile_value') != 'o') {
+
+            // Add X or O on the tile
+            document.querySelector(`[tile_value="${event.target.getAttribute('tile_value')}"]`).innerText = gameState.current_turn.marker;
+
+            // Update origBoard with x or o valus in respective positions
+            origBoard[event.target.getAttribute('tile_value')] = gameState.current_turn.marker;
+
+            // Update tile_value property on the respective tile
+            event.target.setAttribute('tile_value', gameState.current_turn.marker);
+
+            console.log(emptySquares());
+
+
+            let gameWon = checkWin(origBoard, gameState.current_turn.marker);
+            if (gameWon) {
+                gameOver(gameWon);
+            } else if (checkTie()) {
+                gameOver();
+            } else switch_player_turn();
+        }
+    }
+
+    function checkWin(board, player) {
+        let plays = board.reduce((a, e, i) => 
+            (e === player) ? a.concat(i) : a, []);
+        let gameWon = null;
+        for (let [index, win] of winning_conditions.entries()) {
+            if (win.every(elem => plays.indexOf(elem) > -1)) {
+                gameWon = {index: index, player: player};
+                break
+            }
+        }
+        return gameWon;
+    }
+
+    function checkTie() {
+        if (emptySquares().length == 0) {
+             return true;
+        }
+        return false;
+    }
+
+    function gameOver(gameWon) {
+        tiles = document.querySelectorAll('.tile');
+        if (gameWon) {
+            for (let index of winning_conditions[gameWon.index]) {
+                document.querySelector(`[tile_num="${index}"]`).style.backgroundColor = gameWon.player == 'x' ? "blue" :  "red";
+            }
+            for (var i = 0; i < tiles.length; i++) {
+                tiles[i].removeEventListener('click', handleTurn, false)
+            }
+        } else {
+            for (var i = 0; i < tiles.length; i++) {
+                tiles[i].style.backgroundColor = 'green';
+                tiles[i].removeEventListener('click', handleTurn, false)
+            }
+        }
+    }
+
+    function emptySquares() {
+        return origBoard.filter(s => s !== 'x' & s !== 'o');
+    }
+
+    // Switch play turn each time after selecting a tile
+    function switch_player_turn () {
+        gameState.current_turn = gameState.current_turn === gameSettings.player1 ? gameSettings.player2 : gameSettings.player1;
+    }
+
+
+    // Check if now is the turn of the computer and if yes, make the move and run handleGameTurn again
+    // Move this to a separate method
+    // if (gameState.current_turn.player_type === 'computer' && gameState.current_turn.computer_difficulty === 'easy') {
+    //     const randomIndex = Math.floor(Math.random() * remaining_tiles.length);
+    //     const randomValue = remaining_tiles[randomIndex];
+    //     gameState.current_turn.selected.push(randomValue);
+    //     selected_tiles.push(randomValue);
+    //     remaining_tiles = remaining_tiles.filter(item => item !== (randomValue));
+    //     let tile_selected = document.querySelector(`[tile_num="${randomValue}"]`);
+    //     tile_selected.classList.add(gameState.current_turn.tile_class);
+    //     handleGameTurn();
+    // }
+    // if (gameState.current_turn.player_type === 'computer' && gameState.current_turn.computer_difficulty === 'hard') {
+    //     handleGameTurn();
+    // }
+
 
     // Remove gameboard and tiles from DOM at the end of the game
     // Invoked in endGame()
     function hide_tiles () {
-
         // Remove tiles from DOM
         tiles = document.querySelectorAll('.tile');
         tiles.forEach((element) => {
@@ -337,97 +333,15 @@ const gameBoard = (function () {
     // Log tiles object to console for testing purposes
     function console_log () {
         console.log(gameState.current_turn);
+        console.log(origBoard);
         // console.log(tiles);
     };
 
-    // Switch play turn each time after selecting a tile
-    function switch_player_turn () {
-        // Setting initial player turn
-        if (!gameState.current_turn) {
-            // gameState.current_turn = player_turn;
-            gameState.current_turn = gameSettings.player1;
-        }
-
-        // Switching player turns
-        else {
-            gameState.current_turn = gameState.current_turn === gameSettings.player1 ? gameSettings.player2 : gameSettings.player1;
-        }
-
-        // Check if now is the turn of the computer and if yes, make the move and run handleGameTurn again
-        // Move this to a separate method
-        if (gameState.current_turn.player_type === 'computer' && gameState.current_turn.computer_difficulty === 'easy') {
-            const randomIndex = Math.floor(Math.random() * remaining_tiles.length);
-            const randomValue = remaining_tiles[randomIndex];
-            gameState.current_turn.selected.push(randomValue);
-            selected_tiles.push(randomValue);
-            remaining_tiles = remaining_tiles.filter(item => item !== (randomValue));
-            let tile_selected = document.querySelector(`[tile_num="${randomValue}"]`);
-            tile_selected.classList.add(gameState.current_turn.tile_class);
-            handleGameTurn();
-        }
-        if (gameState.current_turn.player_type === 'computer' && gameState.current_turn.computer_difficulty === 'hard') {
-            handleGameTurn();
-        }
-    }
-
-    // Check if winnning conditions are met by comparing each condition to player data
-    function winning_conditions_met () {
-        for (const condition of winning_conditions) {
-            const winning_condition_met = condition.every(value => gameState.current_turn.selected.includes(value));
-            if (winning_condition_met) {
-                return true
-            }
-        }
-        return false
-    };
-
-    // End the game, redirect to the results, and reset the game data
-    function end_game(winner) {
-        // hide_tiles();
-        // gameSettings.show_game_settings();
-        gameState.game_over = true;
-
-        if (!winner) {
-            gameState.tie = true;
-        }
-
-        if (winner) {
-            if (winner.tile_class === 'PlayerOne') {
-                gameState.player1_winner = true;
-            }
-            else if (winner.tile_class === 'PlayerTwo') {
-                gameState.player2_winner = true;
-            }
-        }
-
-        console.log(gameState);
-    }
-
-
-    function handleGameTurn() {
-        // Handle each game turn
-        if (winning_conditions_met()) {
-            end_game(gameState.current_turn);
-        }
-
-        // If 9 tiles have been selected and winning conditions are not met, go back to Settings and reset game data
-        else if (selected_tiles.length === 9) {
-            end_game();
-        }
-
-        // Otherwise, switch player and continue game
-        else {
-            switch_player_turn();
-        }
-    }
-
     return {
-        create_tiles,
-        show_tiles,
         console_log,
-        remaining_tiles,
-        selected_tiles,
+        startGame,
         gameState,
+        origBoard,
     }
 })();
 
