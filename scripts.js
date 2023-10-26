@@ -5,17 +5,18 @@
 const gameSettings = (function () {
 
     // Create two players
-    let player1 = createPlayer('Player X', 'PlayerOne');
-    let player2 = createPlayer('Player O', 'PlayerTwo');
+    let player1 = createPlayer('Player X', 'PlayerOne', 'x');
+    let player2 = createPlayer('Player O', 'PlayerTwo', 'y');
 
     // Factory function to create player objects
-    function createPlayer(name, tile_class, ) {
+    function createPlayer(name, tile_class, marker) {
         let selected = [];
         let player_type = 'human';
         let computer_difficulty = 'easy';
         return {
             name,
             tile_class,
+            marker,
             selected,
             player_type,
             computer_difficulty,
@@ -148,7 +149,7 @@ const gameSettings = (function () {
         gameSettings.player1.selected = [];
         gameSettings.player2.selected = [];
         selected_tiles = [];
-        remaining_tiles = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+        gameBoard.remaining_tiles = [0, 1, 2, 3, 4, 5, 6, 7, 8];
         gameBoard.gameState.current_turn = '';
 
         gameBoard.create_tiles();
@@ -172,7 +173,8 @@ const gameSettings = (function () {
 const gameBoard = (function () {
     let tiles = [];
     let selected_tiles = [];
-    let remaining_tiles = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+    let remaining_tiles = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+    let board_state = [0, 1, 2, 3, 4, 5, 6, 7, 8];
 
     const gameState = {
         current_turn: '',
@@ -199,77 +201,77 @@ const gameBoard = (function () {
     }
 
     const winning_conditions = [
-        [1, 2, 3],
-        [4, 5, 6],
-        [7, 8, 9],
+        [0, 1, 2],
+        [3, 4, 5],
+        [6, 7, 8],
+        [0, 3, 6],
         [1, 4, 7],
         [2, 5, 8],
-        [3, 6, 9],
-        [1, 5, 9],
-        [3, 5, 7],
+        [0, 4, 8],
+        [6, 4, 2]
     ]
 
     // Fill "tiles" array with tiles objects
     function  create_tiles () {
         new_tiles = [
             {
-                tile_num: 1,
+                tile_num: 0,
                 tile_row: 1,
                 tile_column: 1,
                 value: 'empty',
             },
     
             {
-                tile_num: 2,
+                tile_num: 1,
                 tile_row: 1,
                 tile_column: 2,
                 value: 'empty',
             },
             
             {
-                tile_num: 3,
+                tile_num: 2,
                 tile_row: 1,
                 tile_column: 3,
                 value: 'empty',
             },
                     
             {
-                tile_num: 4,
+                tile_num: 3,
                 tile_row: 2,
                 tile_column: 1,
+                value: 'empty',
+            },
+                    
+            {
+                tile_num: 4,
+                tile_row: 2,
+                tile_column: 2,
                 value: 'empty',
             },
                     
             {
                 tile_num: 5,
                 tile_row: 2,
-                tile_column: 2,
-                value: 'empty',
-            },
-                    
-            {
-                tile_num: 6,
-                tile_row: 2,
                 tile_column: 3,
                 value: 'empty',
             },
                     
             {
-                tile_num: 7,
+                tile_num: 6,
                 tile_row: 3,
                 tile_column: 1,
                 value: 'empty',
             },
                     
             {
-                tile_num: 8,
+                tile_num: 7,
                 tile_row: 3,
                 tile_column: 2,
                 value: 'empty',
             },
                     
             {
-                tile_num: 9,
+                tile_num: 8,
                 tile_row: 3,
                 tile_column: 3,
                 value: 'empty',
@@ -298,12 +300,12 @@ const gameBoard = (function () {
             gameboard_container.append(div);
 
             div.addEventListener('click', () => { 
-                if (!gameBoard.gameState.game_over) {
+                if (!gameState.game_over) {
                     // The if ensures that the move counts only when selecting a tile that was not selected before
                     if (!selected_tiles.includes(parseInt((div.getAttribute('tile_num'))))){
                         gameState.current_turn.selected.push(parseInt(div.getAttribute('tile_num')));
                         selected_tiles.push(parseInt(div.getAttribute('tile_num')));
-                        gameBoard.remaining_tiles = gameBoard.remaining_tiles.filter(item => item !== (parseInt(div.getAttribute('tile_num'))));
+                        remaining_tiles = remaining_tiles.filter(item => item !== (parseInt(div.getAttribute('tile_num'))));
                         div.classList.add(gameState.current_turn.tile_class);
                         handleGameTurn();
                     }
@@ -383,22 +385,22 @@ const gameBoard = (function () {
     function end_game(winner) {
         // hide_tiles();
         // gameSettings.show_game_settings();
-        gameBoard.gameState.game_over = true;
+        gameState.game_over = true;
 
         if (!winner) {
-            gameBoard.gameState.tie = true;
+            gameState.tie = true;
         }
 
         if (winner) {
             if (winner.tile_class === 'PlayerOne') {
-                gameBoard.gameState.player1_winner = true;
+                gameState.player1_winner = true;
             }
             else if (winner.tile_class === 'PlayerTwo') {
-                gameBoard.gameState.player2_winner = true;
+                gameState.player2_winner = true;
             }
         }
 
-        console.log(gameBoard.gameState);
+        console.log(gameState);
     }
 
 
