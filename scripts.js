@@ -222,25 +222,52 @@ const gameBoard = (function () {
             gameboard_container.append(div);
 
             // Add event listener to every tile
-            div.addEventListener('click', handleTurn, false);
+            div.addEventListener('click', handleTileClick, false);
         });
     };
 
-    function handleTurn(event) {
+    function handleTileClick(event) {
         if (event.target.getAttribute('tile_value') != 'x' && event.target.getAttribute('tile_value') != 'o') {
 
-            // Add X or O on the tile
-            document.querySelector(`[tile_value="${event.target.getAttribute('tile_value')}"]`).innerText = gameState.current_turn.marker;
 
-            // Update origBoard with x or o valus in respective positions
-            origBoard[event.target.getAttribute('tile_value')] = gameState.current_turn.marker;
+            turn(event.target, gameState.current_turn.marker);
 
-            // Update tile_value property on the respective tile
-            event.target.setAttribute('tile_value', gameState.current_turn.marker);
+            let gameWon = checkWin(origBoard, gameState.current_turn.marker);
+            if (gameWon) {
+                gameOver(gameWon);
+            } else if (checkTie()) {
+                gameOver();
+            } else switch_player_turn();
+        }
+    }
 
-            console.log(emptySquares());
+    function turn(square, marker) {
+        // Add X or O on the tile
+        document.querySelector(`[tile_value="${square.getAttribute('tile_value')}"]`).innerText = marker;
+
+        // Update origBoard with x or o valus in respective positions
+        origBoard[square.getAttribute('tile_value')] = marker;
+
+        // Update tile_value property on the respective tile
+        square.setAttribute('tile_value', marker);
+    }
 
 
+    // Switch play turn each time after selecting a tile
+    function switch_player_turn () {
+        gameState.current_turn = gameState.current_turn === gameSettings.player1 ? gameSettings.player2 : gameSettings.player1;
+        
+        if (gameState.current_turn.player_type === 'computer') {
+            // move = document.querySelector(`[tile_num='3']`);
+
+            move_index = minimax(origBoard, gameState.current_turn).index;
+            // console.log(move_index);
+
+            move = document.querySelector(`[tile_num="${move_index}"]`);
+
+
+            turn(move, gameState.current_turn.marker);
+            
             let gameWon = checkWin(origBoard, gameState.current_turn.marker);
             if (gameWon) {
                 gameOver(gameWon);
@@ -277,12 +304,12 @@ const gameBoard = (function () {
                 document.querySelector(`[tile_num="${index}"]`).style.backgroundColor = gameWon.player == 'x' ? "blue" :  "red";
             }
             for (var i = 0; i < tiles.length; i++) {
-                tiles[i].removeEventListener('click', handleTurn, false)
+                tiles[i].removeEventListener('click', handleTileClick, false)
             }
         } else {
             for (var i = 0; i < tiles.length; i++) {
                 tiles[i].style.backgroundColor = 'green';
-                tiles[i].removeEventListener('click', handleTurn, false)
+                tiles[i].removeEventListener('click', handleTileClick, false)
             }
         }
     }
@@ -291,9 +318,58 @@ const gameBoard = (function () {
         return origBoard.filter(s => s !== 'x' & s !== 'o');
     }
 
-    // Switch play turn each time after selecting a tile
-    function switch_player_turn () {
-        gameState.current_turn = gameState.current_turn === gameSettings.player1 ? gameSettings.player2 : gameSettings.player1;
+    
+    function minimax(newBoard, player) {
+        var availSpots = emptySquares();
+        // console.log(availSpots);
+    
+        if (checkWin(newBoard, gameSettings.player2.marker)) {
+            return {score: -10};
+        } else if (checkWin(newBoard, gameSettings.player1.marker)) {
+            return {score: 10};
+        } else if (availSpots.length === 0) {
+            return {score: 0};
+        }
+    
+        var moves = [];
+        for (var i = 0; i < availSpots.length; i++) {
+            var move = {};
+            move.index = newBoard[availSpots[i]];
+            newBoard[availSpots[i]] = player.marker;
+    
+            if (player == gameSettings.player1) {
+                var result = minimax(newBoard, gameSettings.player2);
+                move.score = result.score;
+            } else {
+                var result = minimax(newBoard, gameSettings.player1);
+                move.score = result.score;
+            }
+    
+            newBoard[availSpots[i]] = move.index;
+    
+            moves.push(move);
+        }
+    
+        var bestMove;
+        if (player === gameSettings.player1) {
+            var bestScore = -10000;
+            for (var i = 0; i < moves.length; i++) {
+                if (moves[i].score > bestScore) {
+                    bestScore = moves[i].score;
+                    bestMove = i;
+                }
+            }
+        } else {
+            var bestScore = 10000;
+            for (var i = 0; i < moves.length; i++) {
+                if (moves[i].score < bestScore) {
+                    bestScore = moves[i].score;
+                    bestMove = i;
+                }
+            }
+        }
+    
+        return moves[bestMove];
     }
 
 
