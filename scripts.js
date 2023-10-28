@@ -257,15 +257,13 @@ const gameBoard = (function () {
     // Switch play turn each time after selecting a tile
     function switch_player_turn () {
         gameState.current_turn = gameState.current_turn === gameSettings.player1 ? gameSettings.player2 : gameSettings.player1;
-        
-        if (gameState.current_turn.player_type === 'computer') {
+        if (gameState.current_turn.player_type === 'computer' && gameState.current_turn.computer_difficulty === 'hard') {
             // move = document.querySelector(`[tile_num='3']`);
 
             move_index = minimax(origBoard, gameState.current_turn).index;
             // console.log(move_index);
 
             move = document.querySelector(`[tile_num="${move_index}"]`);
-
 
             turn(move, gameState.current_turn.marker);
             
@@ -276,8 +274,32 @@ const gameBoard = (function () {
                 gameOver();
             } else switch_player_turn();
         }
+
+        // Check if now is the turn of the computer and if yes, make the move and run handleGameTurn again
+        // Move this to a separate method
+        if (gameState.current_turn.player_type === 'computer' && gameState.current_turn.computer_difficulty === 'easy') {
+            const randomIndex = Math.floor(Math.random() * emptySquares().length);
+            move_index = emptySquares()[randomIndex];
+
+            move = document.querySelector(`[tile_num="${move_index}"]`);
+
+            turn(move, gameState.current_turn.marker);
+            
+            let gameWon = checkWin(origBoard, gameState.current_turn.marker);
+            if (gameWon) {
+                gameOver(gameWon);
+            } else if (checkTie()) {
+                gameOver();
+            } else switch_player_turn();
+            
+        }
     }
 
+
+
+
+
+    
     function checkWin(board, player) {
         let plays = board.reduce((a, e, i) => 
             (e === player) ? a.concat(i) : a, []);
@@ -396,21 +418,7 @@ const gameBoard = (function () {
     }
 
 
-    // Check if now is the turn of the computer and if yes, make the move and run handleGameTurn again
-    // Move this to a separate method
-    // if (gameState.current_turn.player_type === 'computer' && gameState.current_turn.computer_difficulty === 'easy') {
-    //     const randomIndex = Math.floor(Math.random() * remaining_tiles.length);
-    //     const randomValue = remaining_tiles[randomIndex];
-    //     gameState.current_turn.selected.push(randomValue);
-    //     selected_tiles.push(randomValue);
-    //     remaining_tiles = remaining_tiles.filter(item => item !== (randomValue));
-    //     let tile_selected = document.querySelector(`[tile_num="${randomValue}"]`);
-    //     tile_selected.classList.add(gameState.current_turn.tile_class);
-    //     handleGameTurn();
-    // }
-    // if (gameState.current_turn.player_type === 'computer' && gameState.current_turn.computer_difficulty === 'hard') {
-    //     handleGameTurn();
-    // }
+
 
 
     // Remove gameboard and tiles from DOM at the end of the game
