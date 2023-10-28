@@ -179,6 +179,7 @@ const gameBoard = (function () {
 
     function startGame() {
         drawGameboard();
+        handleAiMove();
     }
 
     // Add gameboard and tiles to DOM
@@ -271,7 +272,11 @@ const gameBoard = (function () {
     // Check if current turn is that of the AI and if so, invoke the logic to determine the AI move
     function handleAiMove() {
         if (gameState.current_turn.player_type === 'computer') {
-            if (gameState.current_turn.computer_difficulty === 'easy') {
+            // If this is first move of the AI, make the random move
+            if (emptySquares().length === 9) {
+                aiMoveEasy();
+            }
+            else if (gameState.current_turn.computer_difficulty === 'easy') {
                 aiMoveEasy();
             } else if (gameState.current_turn.computer_difficulty === 'hard') {
                 aiMoveImpossible();
