@@ -33,7 +33,7 @@ body {
 
 .settings-container {
     width: min(90%, 900px);
-    height: 60%;
+    /* height: 60%; */
     display: grid;
     grid-template-rows: 1fr 3fr;
     gap: 30px;
@@ -58,7 +58,7 @@ body {
 .player-selection-area > .player-selection {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
-    grid-template-rows: 3fr 1fr 1fr 1fr 1fr 1fr;
+    grid-template-rows: 3fr 0.5fr 1fr 1fr 1fr 1fr;
     
     /* border-radius: 15px; */
     /* box-shadow: 0px 0px 10px 0px #4C4816; */
@@ -73,19 +73,51 @@ body {
     align-items: center;
 }
 
-.player-selection-area > .player-selection > div:not(:first-child) {
-    border: 0.5px green solid;
+.player-selection-area > .player-selection.one > .player-icon,
+.player-selection-area > .player-selection.two > .player-icon {
+    border-radius: 50%;
+    transition: all 0.5s ease-in-out;
+    /* animation: float 1s ease-in-out infinite; */
+}
+
+.player-selection-area > .player-selection.one:hover > .player-icon,
+.player-selection-area > .player-selection.two:hover > .player-icon {
+    /* transform: scale(1.2); */
+    /* transform: translatey(0px); */
+    /* animation: float 1s ease-in-out infinite; */
+    transform: rotate(360deg) scale(1.2);
     box-shadow: 0px 0px 5px 0px #4C4816;
-    background-color: #f2fedc49;
+}
+
+.player-selection-area > .player-selection > div:not(:first-child) {
+    border: 0.5px hsl(56, 55%, 19%) solid;
+    box-shadow: 0px 0px 5px 0px #4C4816;
+    background-color: hsla(81, 94%, 93%, 0.200);
     cursor: pointer;
 }
 
 .player-selection-area > .player-selection > div:not(:first-child):hover {
-    background-color: #f2fedc70;
+    background-color: hsla(81, 94%, 93%, 0.400);
 }
 
 .player-selection-area > .player-selection > div:not(:first-child):active {
-    background-color: #f2fedc98;
+    background-color: hsla(81, 94%, 93%, 0.600);
+}
+
+.settings-container > .start-button {
+    background-color: hsl(55, 60%, 48%);
+    border-radius: 5px;
+    border: 0.5px #4C4816 solid;
+    box-shadow: 0px 0px 5px 0px #4C4816;
+    cursor: pointer;
+}
+
+.settings-container > .start-button:hover {
+    background-color: hsl(55, 70%, 48%);
+}
+
+.settings-container > .start-button:active {
+    background-color: hsl(55, 80%, 48%);
 }
 
 .player-selection-area > .player-selection.one > div.active {
@@ -106,28 +138,28 @@ body {
 
 .player-selection-area > .player-selection > .human-option {
     grid-column: 2 / 6;
-    grid-row: 2 / 3;
+    grid-row: 3 / 4;
     justify-self: center;
     width: 100%;
 }
 
 .player-selection-area > .player-selection > .computer-option {
     grid-column: 2 / 6;
-    grid-row: 3 / 4;
+    grid-row: 4 / 5;
     justify-self: center;
     width: 100%;
 }
 
 .player-selection-area > .player-selection > .difficulty.easy {
     grid-column: 2 / 6;
-    grid-row: 4 / 5;
+    grid-row: 5 / 6;
     justify-self: center;
     width: 100%;
 }
 
 .player-selection-area > .player-selection > .difficulty.hard {
     grid-column: 2 / 6;
-    grid-row: 5 / 6;
+    grid-row: 6 / 7;
     justify-self: center;
     width: 100%;
 }
@@ -193,3 +225,21 @@ svg path {
     position: absolute;
     text-align: center;
 }
+
+
+
+
+@keyframes float {
+    0% {
+      /* box-shadow: 0 5px 15px 0px rgba(0,0,0,0.6); */
+      transform: translatey(0px);
+    }
+    50% {
+      /* box-shadow: 0 25px 15px 0px rgba(0,0,0,0.2); */
+      transform: translatey(-10px);
+    }
+    100% {
+      /* box-shadow: 0 5px 15px 0px rgba(0,0,0,0.6); */
+      transform: translatey(0px);
+    }
+  }
