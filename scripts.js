@@ -143,7 +143,6 @@ const gameSettings = (function () {
     function hide_game_settings () {
         settings_container = document.querySelector('.settings-container');
         settings_container.remove();
-
         gameBoard.startGame();
     }
 
@@ -178,26 +177,6 @@ const gameBoard = (function () {
 
     const gameState = {
         current_turn: gameSettings.player1,
-        game_over: false,
-        tie: false,
-        player1_winner: false,
-        player2_winner: false,
-        evaluate_score: function () {
-            if (gameState.game_over) {
-                if (gameState.tie) {
-                    return 0
-                }
-                else if (gameState.player1_winner) {
-                    return 1
-                }
-                else if (gameState.player2_winner) {
-                    return -1
-                }
-            }
-            else {
-                return "Game not over yet"
-            }
-        },
     }
 
     function startGame() {
@@ -229,77 +208,26 @@ const gameBoard = (function () {
 
     function handleTileClick(event) {
         if (event.target.getAttribute('tile_value') != 'x' && event.target.getAttribute('tile_value') != 'o') {
-
-
             turn(event.target, gameState.current_turn.marker);
-
-            let gameWon = checkWin(origBoard, gameState.current_turn.marker);
-            if (gameWon) {
-                gameOver(gameWon);
-            } else if (checkTie()) {
-                gameOver();
-            } else switch_player_turn();
+            handleMoveOutcome();
         }
     }
 
     function turn(square, marker) {
-        // Add X or O on the tile
-        // document.querySelector(`[tile_value="${square.getAttribute('tile_value')}"]`).innerText = marker;
-
         // Update origBoard with x or o valus in respective positions
         origBoard[square.getAttribute('tile_value')] = marker;
-
         // Update tile_value property on the respective tile
         square.setAttribute('tile_value', marker);
     }
 
-
-    // Switch play turn each time after selecting a tile
-    function switch_player_turn () {
-        gameState.current_turn = gameState.current_turn === gameSettings.player1 ? gameSettings.player2 : gameSettings.player1;
-        if (gameState.current_turn.player_type === 'computer' && gameState.current_turn.computer_difficulty === 'hard') {
-            // move = document.querySelector(`[tile_num='3']`);
-
-            move_index = minimax(origBoard, gameState.current_turn).index;
-            // console.log(move_index);
-
-            move = document.querySelector(`[tile_num="${move_index}"]`);
-
-            turn(move, gameState.current_turn.marker);
-            
-            let gameWon = checkWin(origBoard, gameState.current_turn.marker);
-            if (gameWon) {
-                gameOver(gameWon);
-            } else if (checkTie()) {
-                gameOver();
-            } else switch_player_turn();
-        }
-
-        // Check if now is the turn of the computer and if yes, make the move and run handleGameTurn again
-        // Move this to a separate method
-        if (gameState.current_turn.player_type === 'computer' && gameState.current_turn.computer_difficulty === 'easy') {
-            const randomIndex = Math.floor(Math.random() * emptySquares().length);
-            move_index = emptySquares()[randomIndex];
-
-            move = document.querySelector(`[tile_num="${move_index}"]`);
-
-            turn(move, gameState.current_turn.marker);
-            
-            let gameWon = checkWin(origBoard, gameState.current_turn.marker);
-            if (gameWon) {
-                gameOver(gameWon);
-            } else if (checkTie()) {
-                gameOver();
-            } else switch_player_turn();
-            
-        }
+    function handleMoveOutcome() {
+        if (checkWin(origBoard, gameState.current_turn.marker)) {
+            gameOver(checkWin(origBoard, gameState.current_turn.marker));
+        } else if (checkTie()) {
+            gameOver();
+        } else switch_player_turn();
     }
 
-
-
-
-
-    
     function checkWin(board, player) {
         let plays = board.reduce((a, e, i) => 
             (e === player) ? a.concat(i) : a, []);
@@ -319,22 +247,54 @@ const gameBoard = (function () {
         }
         return false;
     }
-
+    
     function gameOver(gameWon) {
         tiles = document.querySelectorAll('.tile');
         if (gameWon) {
             for (let index of winning_conditions[gameWon.index]) {
                 document.querySelector(`[tile_num="${index}"]`).style.backgroundColor = gameWon.player == 'x' ? "blue" :  "red";
             }
-            for (var i = 0; i < tiles.length; i++) {
-                tiles[i].removeEventListener('click', handleTileClick, false)
-            }
         } else {
             for (var i = 0; i < tiles.length; i++) {
-                tiles[i].style.backgroundColor = 'green';
-                tiles[i].removeEventListener('click', handleTileClick, false)
+                tiles[i].style.backgroundColor = 'grey';
             }
         }
+        for (var i = 0; i < tiles.length; i++) {
+            tiles[i].removeEventListener('click', handleTileClick, false)
+        }
+    }
+
+    // Switch play turn each time after selecting a tile
+    function switch_player_turn () {
+        gameState.current_turn = gameState.current_turn === gameSettings.player1 ? gameSettings.player2 : gameSettings.player1;
+        handleAiMove();
+    }
+
+    // Check if current turn is that of the AI and if so, invoke the logic to determine the AI move
+    function handleAiMove() {
+        if (gameState.current_turn.player_type === 'computer') {
+            if (gameState.current_turn.computer_difficulty === 'easy') {
+                ai_move_easy();
+            } else if (gameState.current_turn.computer_difficulty === 'hard') {
+                ai_move_impossible();
+            }
+        }
+    }
+
+    function ai_move_easy() {
+        const randomIndex = Math.floor(Math.random() * emptySquares().length);
+        const move_index = emptySquares()[randomIndex];
+        const move = document.querySelector(`[tile_num="${move_index}"]`);
+        turn(move, gameState.current_turn.marker);
+        handleMoveOutcome();
+    }
+
+    function ai_move_impossible() {
+        const move_index = minimax(origBoard, gameState.current_turn).index;
+        const move = document.querySelector(`[tile_num="${move_index}"]`);
+
+        turn(move, gameState.current_turn.marker);
+        handleMoveOutcome();
     }
 
     function emptySquares() {
@@ -417,10 +377,6 @@ const gameBoard = (function () {
         return moves[bestMove];
     }
 
-
-
-
-
     // Remove gameboard and tiles from DOM at the end of the game
     // Invoked in endGame()
     function hide_tiles () {
@@ -437,15 +393,7 @@ const gameBoard = (function () {
         }
     };
 
-    // Log tiles object to console for testing purposes
-    function console_log () {
-        console.log(gameState.current_turn);
-        console.log(origBoard);
-        // console.log(tiles);
-    };
-
     return {
-        console_log,
         startGame,
         gameState,
         origBoard,
