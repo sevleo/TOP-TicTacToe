@@ -24,7 +24,7 @@ const gameSettings = (function () {
 
     // Draw "settings-container" div and its children
     // Run at the page load
-    function show_game_settings () {
+    function showGameSettings () {
 
         // Reset player settings to default
         gameSettings.player1.computer_difficulty = 'easy';
@@ -49,16 +49,16 @@ const gameSettings = (function () {
         player1_settings = document.createElement('div');
         player1_settings.classList.add('player-selection', 'one');
         player_selection_area.append(player1_settings);
-        fill_player_selection(player1_settings, player1);
+        fillPlayerSelection(player1_settings, player1);
 
         // Draw player-selection two div
         player2_settings = document.createElement('div');
         player2_settings.classList.add('player-selection', 'two');
         player_selection_area.append(player2_settings);
-        fill_player_selection(player2_settings, player2);
+        fillPlayerSelection(player2_settings, player2);
 
         // Draw insides of player-selection-one/two div
-        function fill_player_selection(player_settings_div, player) {
+        function fillPlayerSelection(player_settings_div, player) {
             player_name = document.createElement('p');
             
             // Draw player name 
@@ -71,7 +71,7 @@ const gameSettings = (function () {
             human_option.textContent = 'Human';
             player_settings_div.append(human_option);
             human_option.addEventListener('click', () => {
-                hide_difficulty(player_settings_div);
+                hideDifficulty(player_settings_div);
                 player.player_type = 'human';
             });
 
@@ -81,12 +81,12 @@ const gameSettings = (function () {
             computer_option.classList.add("computer-option");
             player_settings_div.append(computer_option);
             computer_option.addEventListener('click', () => {
-                show_difficulty(player_settings_div);
+                showDifficulty(player_settings_div);
                 player.player_type = 'computer';
             });
 
             // Show difficulty settings for "Computer" player option
-            function show_difficulty(player_settings_div) {
+            function showDifficulty(player_settings_div) {
                 existing_buttons = document.querySelector(`.player-selection.${player_settings_div.classList[1]} > .difficulty`);
                 // Check if nodes for these buttons already exist in corresponding player selection area
                 if (!existing_buttons) {
@@ -118,7 +118,7 @@ const gameSettings = (function () {
 
             // Hide difficulty settings when "Computer" player option is 
             // no longer selected
-            function hide_difficulty(player_settings_div) {
+            function hideDifficulty(player_settings_div) {
                 existing_buttons = document.querySelectorAll(`.player-selection.${player_settings_div.classList[1]} > .difficulty`);
                 if (existing_buttons) {
                     existing_buttons.forEach((button) => {
@@ -135,29 +135,27 @@ const gameSettings = (function () {
         settings_container.append(start_game_button);
 
         start_game_button.addEventListener('click', function () {
-            hide_game_settings();
+            hideGameSettings();
         });
     }
 
     // Hides game settings, invoked by clicking at "start-button"
-    function hide_game_settings () {
+    function hideGameSettings () {
         settings_container = document.querySelector('.settings-container');
         settings_container.remove();
         gameBoard.startGame();
     }
 
     return {
-        show_game_settings,
+        showGameSettings,
         player1,
         player2,
     }
 })();
 
 
-/*
-** The Gameboard represents the state of the board, 
-** showing tiles and hiding tiles from the screen, as well as 
-** definig winning conditions, handling turns, and managing AI
+/* This module defines the game logic, including initializing the game board, 
+** handling player turns, checking for wins, ties, and AI moves.
 */
 const gameBoard = (function () {
 
@@ -180,11 +178,11 @@ const gameBoard = (function () {
     }
 
     function startGame() {
-        draw_gameboard();
+        drawGameboard();
     }
 
     // Add gameboard and tiles to DOM
-    function draw_gameboard () {
+    function drawGameboard () {
         main_container = document.querySelector('#main-container');
         
         // Draw gameboard
@@ -225,7 +223,7 @@ const gameBoard = (function () {
             gameOver(checkWin(origBoard, gameState.current_turn.marker));
         } else if (checkTie()) {
             gameOver();
-        } else switch_player_turn();
+        } else switchPlayerTurn();
     }
 
     function checkWin(board, player) {
@@ -265,7 +263,7 @@ const gameBoard = (function () {
     }
 
     // Switch play turn each time after selecting a tile
-    function switch_player_turn () {
+    function switchPlayerTurn () {
         gameState.current_turn = gameState.current_turn === gameSettings.player1 ? gameSettings.player2 : gameSettings.player1;
         handleAiMove();
     }
@@ -274,14 +272,14 @@ const gameBoard = (function () {
     function handleAiMove() {
         if (gameState.current_turn.player_type === 'computer') {
             if (gameState.current_turn.computer_difficulty === 'easy') {
-                ai_move_easy();
+                aiMoveEasy();
             } else if (gameState.current_turn.computer_difficulty === 'hard') {
-                ai_move_impossible();
+                aiMoveImpossible();
             }
         }
     }
 
-    function ai_move_easy() {
+    function aiMoveEasy() {
         const randomIndex = Math.floor(Math.random() * emptySquares().length);
         const move_index = emptySquares()[randomIndex];
         const move = document.querySelector(`[tile_num="${move_index}"]`);
@@ -289,7 +287,7 @@ const gameBoard = (function () {
         handleMoveOutcome();
     }
 
-    function ai_move_impossible() {
+    function aiMoveImpossible() {
         const move_index = minimax(origBoard, gameState.current_turn).index;
         const move = document.querySelector(`[tile_num="${move_index}"]`);
 
@@ -379,7 +377,7 @@ const gameBoard = (function () {
 
     // Remove gameboard and tiles from DOM at the end of the game
     // Invoked in endGame()
-    function hide_tiles () {
+    function hideTiles () {
         // Remove tiles from DOM
         tiles = document.querySelectorAll('.tile');
         tiles.forEach((element) => {
@@ -401,4 +399,4 @@ const gameBoard = (function () {
 })();
 
 // Draw "settings-container" div and its children
-gameSettings.show_game_settings();
+gameSettings.showGameSettings();
