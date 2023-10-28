@@ -1,18 +1,8 @@
-implement the minimax algorithm
-in switch_player_turn, move to a separate function the part of code responsible for computer move
-add redirect to the game resutls screen with buttons to go back to settings or start again
-add styles
+colors https://mycolor.space/?hex=%23C0B807&sub=1 pin palette
 
+range from #c0b807 to #4b8077
 
-Minimax algo
-
-gameBoard.remaining_tiles
-gameBoard.selected_tiles
-gameSettings.player1.selected
-gameSettings.player2.selected
-gameBoard.gameState
-
-
+borders #4C4816
 
 
 

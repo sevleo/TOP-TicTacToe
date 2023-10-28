@@ -25,6 +25,7 @@ const gameSettings = (function () {
     // Draw "settings-container" div and its children
     // Run at the page load
     function showGameSettings () {
+        gameBoard.resetGame();
 
         // Reset player settings to default
         gameSettings.player1.computer_difficulty = 'easy';
@@ -59,10 +60,11 @@ const gameSettings = (function () {
 
         // Draw insides of player-selection-one/two div
         function fillPlayerSelection(player_settings_div, player) {
-            player_name = document.createElement('p');
+            player_name = document.createElement('div');
+            player_name.classList.add('player-icon');
             
             // Draw player name 
-            player_name.textContent = player.name;
+            // player_name.textContent = player.name;
             player_settings_div.append(player_name);
 
             // Draw "Human" player option
@@ -178,6 +180,7 @@ const gameBoard = (function () {
     }
 
     function startGame() {
+        resetGame();
         drawGameboard();
         handleAiMove();
     }
@@ -247,11 +250,11 @@ const gameBoard = (function () {
         return false;
     }
     
-    function gameOver(gameWon) {
+    function gameOver(winningCombo) {
         tiles = document.querySelectorAll('.tile');
-        if (gameWon) {
-            for (let index of winning_conditions[gameWon.index]) {
-                document.querySelector(`[tile_num="${index}"]`).style.backgroundColor = gameWon.player == 'x' ? "blue" :  "red";
+        if (winningCombo) {
+            for (let index of winning_conditions[winningCombo.index]) {
+                document.querySelector(`[tile_num="${index}"]`).style.backgroundColor = winningCombo.player == 'x' ? "blue" :  "red";
             }
         } else {
             for (var i = 0; i < tiles.length; i++) {
@@ -261,6 +264,7 @@ const gameBoard = (function () {
         for (var i = 0; i < tiles.length; i++) {
             tiles[i].removeEventListener('click', handleTileClick, false)
         }
+        document.querySelector('.endgame').style.display = 'block';
     }
 
     // Switch play turn each time after selecting a tile
@@ -382,22 +386,20 @@ const gameBoard = (function () {
 
     // Remove gameboard and tiles from DOM at the end of the game
     // Invoked in endGame()
-    function hideTiles () {
-        // Remove tiles from DOM
-        tiles = document.querySelectorAll('.tile');
-        tiles.forEach((element) => {
-            element.remove();
-        });
-
+    function resetGame () {
         // Remove gameboard from DOM
+        document.querySelector('.endgame').style.display = 'none';
         gameboard_container = document.querySelector('.gameboard-container');
         if (gameboard_container) {
             gameboard_container.remove();
         }
+        origBoard = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+        gameState.current_turn = gameSettings.player1;
     };
 
     return {
         startGame,
+        resetGame,
         gameState,
         origBoard,
     }
