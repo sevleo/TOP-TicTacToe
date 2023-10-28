@@ -162,7 +162,8 @@ const gameSettings = (function () {
 */
 const gameBoard = (function () {
 
-    let origBoard = Array.from(Array(9).keys());
+    // let origBoard = Array.from(Array(9).keys());
+    let origBoard = [0, 1, 2, 3, 4, 5, 6, 7, 8];
 
     const winning_conditions = [
         [0, 1, 2],
@@ -243,7 +244,7 @@ const gameBoard = (function () {
 
     function turn(square, marker) {
         // Add X or O on the tile
-        document.querySelector(`[tile_value="${square.getAttribute('tile_value')}"]`).innerText = marker;
+        // document.querySelector(`[tile_value="${square.getAttribute('tile_value')}"]`).innerText = marker;
 
         // Update origBoard with x or o valus in respective positions
         origBoard[square.getAttribute('tile_value')] = marker;
@@ -318,11 +319,18 @@ const gameBoard = (function () {
         return origBoard.filter(s => s !== 'x' & s !== 'o');
     }
 
-    
+    // return a value if a terminal state is found (+10, 0, -10)
+    // go through available spots on the board
+    // call the minimax function on each available spot (recursion)
+    // evaluate returning values from function calls
+    // and return the best value
     function minimax(newBoard, player) {
+
+        //available spots
         var availSpots = emptySquares();
-        // console.log(availSpots);
-    
+
+        // checks for the terminal states such as win, lose, and tie 
+        // and returning a value accordingly
         if (checkWin(newBoard, gameSettings.player2.marker)) {
             return {score: -10};
         } else if (checkWin(newBoard, gameSettings.player1.marker)) {
@@ -330,13 +338,22 @@ const gameBoard = (function () {
         } else if (availSpots.length === 0) {
             return {score: 0};
         }
-    
+
+        // an array to collect all the objects
         var moves = [];
+
+        // loop through available spots
         for (var i = 0; i < availSpots.length; i++) {
+
+            //create an object for each and store the index of that spot
             var move = {};
             move.index = newBoard[availSpots[i]];
+
+            // set the empty spot to the current player
             newBoard[availSpots[i]] = player.marker;
     
+            // collect the score resulted from calling minimax 
+            // on the opponent of the current player
             if (player == gameSettings.player1) {
                 var result = minimax(newBoard, gameSettings.player2);
                 move.score = result.score;
@@ -344,12 +361,15 @@ const gameBoard = (function () {
                 var result = minimax(newBoard, gameSettings.player1);
                 move.score = result.score;
             }
-    
+
+            // reset the spot to empty
             newBoard[availSpots[i]] = move.index;
     
+            // push the object to the array
             moves.push(move);
         }
     
+        // if it is the computer's turn loop over the moves and choose the move with the highest score
         var bestMove;
         if (player === gameSettings.player1) {
             var bestScore = -10000;
@@ -360,6 +380,8 @@ const gameBoard = (function () {
                 }
             }
         } else {
+            
+            // else loop over the moves and choose the move with the lowest score
             var bestScore = 10000;
             for (var i = 0; i < moves.length; i++) {
                 if (moves[i].score < bestScore) {
@@ -369,6 +391,7 @@ const gameBoard = (function () {
             }
         }
     
+        // return the chosen move (object) from the moves array
         return moves[bestMove];
     }
 
