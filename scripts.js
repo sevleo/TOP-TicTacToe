@@ -52,6 +52,11 @@ const gameSettings = (function () {
         player_selection_area.append(player1_settings);
         fillPlayerSelection(player1_settings, player1);
 
+        // Draw divider
+        dividing_line = document.createElement('div');
+        dividing_line.classList.add('divider');
+        player_selection_area.append(dividing_line);
+
         // Draw player-selection two div
         player2_settings = document.createElement('div');
         player2_settings.classList.add('player-selection', 'two');
@@ -69,22 +74,38 @@ const gameSettings = (function () {
 
             // Draw "Human" player option
             human_option = document.createElement('div');
-            human_option.classList.add("human-option");
+            human_option.classList.add("human-option", "active");
             human_option.textContent = 'Human';
             player_settings_div.append(human_option);
             human_option.addEventListener('click', () => {
                 hideDifficulty(player_settings_div);
                 player.player_type = 'human';
+
+                // Activate highlight effect on human option button
+                human_option_div = document.querySelector(`.${player_settings_div.classList[0]}.${player_settings_div.classList[1]} > .human-option`);
+                human_option_div.classList.add("active");
+
+                // Deactivate highlight effect on computer option button
+                computer_option_div = document.querySelector(`.${player_settings_div.classList[0]}.${player_settings_div.classList[1]} > .computer-option`);
+                computer_option_div.classList.remove("active");
             });
 
             // Draw "Computer" player option
             computer_option = document.createElement('div');
-            computer_option.textContent = 'Computer';
+            computer_option.textContent = 'AI';
             computer_option.classList.add("computer-option");
             player_settings_div.append(computer_option);
             computer_option.addEventListener('click', () => {
                 showDifficulty(player_settings_div);
                 player.player_type = 'computer';
+
+                // Activate highlight effect on computer option button
+                computer_option_div = document.querySelector(`.${player_settings_div.classList[0]}.${player_settings_div.classList[1]} > .computer-option`);
+                computer_option_div.classList.add("active");
+
+                // Deactivate highlight effect on human option button
+                human_option_div = document.querySelector(`.${player_settings_div.classList[0]}.${player_settings_div.classList[1]} > .human-option`);
+                human_option_div.classList.remove("active");
             });
 
             // Show difficulty settings for "Computer" player option
@@ -98,14 +119,14 @@ const gameSettings = (function () {
                     player_settings_div.append(easy);
                     easy.addEventListener('click', () => {
                         player.computer_difficulty = 'easy';
-                    })
-    
-                    medium = document.createElement('div');
-                    medium.textContent = 'Medium';
-                    medium.classList.add('difficulty', 'medium');
-                    player_settings_div.append(medium);
-                    medium.addEventListener('click', () => {
-                        player.computer_difficulty = 'medium';
+
+                        // Activate highlight effect on easy difficulty button
+                        human_option_div = document.querySelector(`.${player_settings_div.classList[0]}.${player_settings_div.classList[1]} > .difficulty.easy`);
+                        human_option_div.classList.add("active");
+
+                        // Deactivate highlight effect on hard difficulty button
+                        computer_option_div = document.querySelector(`.${player_settings_div.classList[0]}.${player_settings_div.classList[1]} > .difficulty.hard`);
+                        computer_option_div.classList.remove("active");
                     })
     
                     hard = document.createElement('div');
@@ -114,7 +135,22 @@ const gameSettings = (function () {
                     player_settings_div.append(hard);
                     hard.addEventListener('click', () => {
                         player.computer_difficulty = 'hard';
+
+                        // Activate highlight effect on hard difficulty button
+                        human_option_div = document.querySelector(`.${player_settings_div.classList[0]}.${player_settings_div.classList[1]} > .difficulty.hard`);
+                        human_option_div.classList.add("active");
+
+                        // Deactivate highlight effect on easy difficulty button
+                        computer_option_div = document.querySelector(`.${player_settings_div.classList[0]}.${player_settings_div.classList[1]} > .difficulty.easy`);
+                        computer_option_div.classList.remove("active");
                     })
+
+                    // Highlight the difficulty that was selected before collapsing the difficulty settings
+                    if (player.computer_difficulty === 'easy') {
+                        easy.classList.add('active');
+                    } else if (player.computer_difficulty === 'hard') {
+                        hard.classList.add('active');
+                    }
                 }
             }
 
