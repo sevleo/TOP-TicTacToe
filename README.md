@@ -1,6 +1,6 @@
 ## Tic Tac Toe
 <h2>
-    <a href="https://sevleo.github.io/library/">Preview link</a>
+    <a href="https://sevleo.github.io/tic_tac_toe/">Preview link</a>
 </h2>
 
 ### About the project
