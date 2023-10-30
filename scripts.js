@@ -31,7 +31,7 @@ const gameSettings = (function () {
         gameSettings.player1.computer_difficulty = 'easy';
         gameSettings.player1.player_type = 'human';
         gameSettings.player2.computer_difficulty = 'easy';
-        gameSettings.player2.player_type = 'human';
+        gameSettings.player2.player_type = 'computer';
 
         // Select main-container
         main_container = document.querySelector('#main-container');
@@ -74,7 +74,11 @@ const gameSettings = (function () {
 
             // Draw "Human" player option
             human_option = document.createElement('div');
-            human_option.classList.add("human-option", "active");
+            if (player === gameSettings.player2) {
+                human_option.classList.add("human-option");
+            } else {
+                human_option.classList.add("human-option", "active");
+            }
             human_option.textContent = 'Human';
             player_settings_div.append(human_option);
             human_option.addEventListener('click', () => {
@@ -93,7 +97,12 @@ const gameSettings = (function () {
             // Draw "Computer" player option
             computer_option = document.createElement('div');
             computer_option.textContent = 'AI';
-            computer_option.classList.add("computer-option");
+            if (player === gameSettings.player2) {
+                computer_option.classList.add("computer-option", "active");
+                showDifficulty(player_settings_div);
+            } else {
+                computer_option.classList.add("computer-option");
+            }
             player_settings_div.append(computer_option);
             computer_option.addEventListener('click', () => {
                 showDifficulty(player_settings_div);
@@ -169,7 +178,7 @@ const gameSettings = (function () {
         // Draw start-button
         start_game_button = document.createElement('button');
         start_game_button.classList.add('start-button');
-        start_game_button.textContent = 'Start game';
+        start_game_button.textContent = 'Play';
         settings_container.append(start_game_button);
 
         start_game_button.addEventListener('click', function () {
@@ -288,9 +297,11 @@ const gameBoard = (function () {
     
     function gameOver(winningCombo) {
         tiles = document.querySelectorAll('.tile');
+
         if (winningCombo) {
             for (let index of winning_conditions[winningCombo.index]) {
-                document.querySelector(`[tile_num="${index}"]`).style.backgroundColor = winningCombo.player == 'x' ? "blue" :  "red";
+                document.querySelector(`[tile_num="${index}"]`).classList.add("winning-tile");
+                // document.querySelector(`[tile_num="${index}"]`).style.backgroundColor = winningCombo.player == 'x' ? "blue" :  "red";
             }
         } else {
             for (var i = 0; i < tiles.length; i++) {
@@ -333,7 +344,7 @@ const gameBoard = (function () {
     }
 
     function aiMoveImpossible() {
-        const move_index = minimax(origBoard, gameState.current_turn).index;
+        const move_index = minimax(origBoard, gameState.current_turn, 0).index;
         const move = document.querySelector(`[tile_num="${move_index}"]`);
 
         turn(move, gameState.current_turn.marker);
@@ -349,20 +360,21 @@ const gameBoard = (function () {
     // call the minimax function on each available spot (recursion)
     // evaluate returning values from function calls
     // and return the best value
-    function minimax(newBoard, player) {
+    function minimax(newBoard, player, depth) {
 
         //available spots
         var availSpots = emptySquares();
 
         // checks for the terminal states such as win, lose, and tie 
         // and returning a value accordingly
-        if (checkWin(newBoard, gameSettings.player2.marker)) {
-            return {score: -10};
+        if (checkWin(newBoard, gameSettings.player2.marker, depth)) {
+            return {score: depth-10};
         } else if (checkWin(newBoard, gameSettings.player1.marker)) {
-            return {score: 10};
+            return {score: 10-depth};
         } else if (availSpots.length === 0) {
             return {score: 0};
         }
+        depth += 1;
 
         // an array to collect all the objects
         var moves = [];
@@ -380,10 +392,10 @@ const gameBoard = (function () {
             // collect the score resulted from calling minimax 
             // on the opponent of the current player
             if (player == gameSettings.player1) {
-                var result = minimax(newBoard, gameSettings.player2);
+                var result = minimax(newBoard, gameSettings.player2, depth);
                 move.score = result.score;
             } else {
-                var result = minimax(newBoard, gameSettings.player1);
+                var result = minimax(newBoard, gameSettings.player1, depth);
                 move.score = result.score;
             }
 

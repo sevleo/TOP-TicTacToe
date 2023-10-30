@@ -6,6 +6,13 @@ borders #4C4816
 
 
 
+
+tiles must contain a separate div for svg
+this svg needs to be modified as a circle and it needs an animation
+
+AI should be default option for player 2
+
+
 <!-- ## Tic Tac Toe
 <h2>
     <a href="https://sevleo.github.io/library/">Preview link</a>
