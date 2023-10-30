@@ -311,7 +311,7 @@ const gameBoard = (function () {
         for (var i = 0; i < tiles.length; i++) {
             tiles[i].removeEventListener('click', handleTileClick, false)
         }
-        document.querySelector('.endgame').style.display = 'block';
+        document.querySelector('.endgame').style.display = 'flex';
     }
 
     // Switch play turn each time after selecting a tile

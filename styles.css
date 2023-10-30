@@ -108,7 +108,8 @@ body {
     background-color: hsla(81, 94%, 93%, 0.600);
 }
 
-.settings-container > .start-button {
+.settings-container > .start-button,
+.endgame > div {
     background-color: hsl(55, 60%, 48%);
     border-radius: 5px;
     border: 0.5px #4C4816 solid;
@@ -117,11 +118,13 @@ body {
     font-size: 20px;
 }
 
-.settings-container > .start-button:hover {
+.settings-container > .start-button:hover,
+.endgame > div:hover {
     background-color: hsl(55, 70%, 48%);
 }
 
-.settings-container > .start-button:active {
+.settings-container > .start-button:active,
+.endgame > div:active {
     background-color: hsl(55, 80%, 48%);
 }
 
@@ -183,8 +186,8 @@ body {
 }
 
 .start-button {
-    width: 300px;
-    height: 100px;
+    width: 200px;
+    height: 80px;
     justify-self: center;
 }
 
@@ -253,11 +256,25 @@ svg path {
 
 .endgame {
     display: none;
-    width: 200px;
+    width: 300px;
     height: 100px;
-    background-color: rgba(66, 66, 66, 0.354);
+    background-color: rgba(66, 66, 66, 0.594);
     position: absolute;
     text-align: center;
+    bottom: 50px;
+    border-radius: 5px;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
+
+.endgame > div {
+    height: 40px;
+    width: 80px;
+    font-size: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .winning-tile {
