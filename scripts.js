@@ -367,7 +367,7 @@ const gameBoard = (function () {
 
         // checks for the terminal states such as win, lose, and tie 
         // and returning a value accordingly
-        if (checkWin(newBoard, gameSettings.player2.marker, depth)) {
+        if (checkWin(newBoard, gameSettings.player2.marker)) {
             return {score: depth-10};
         } else if (checkWin(newBoard, gameSettings.player1.marker)) {
             return {score: 10-depth};
